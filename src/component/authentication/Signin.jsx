@@ -61,7 +61,7 @@ const Signin = () => {
 
   const handleForgotCheck = async () => {
     await axios
-      .post(`https://inv.orivesolutions.com/forgot-password`, {
+      .post(`http://localhost:3500/forgot-password`, {
         forgotEmail: forgotEmail,
       })
       .then((res) => {
@@ -159,7 +159,7 @@ const Signin = () => {
   const [getData, setGetData] = useState([]);
 
   const getMpin = async () => {
-    const result = await axios.get("https://inv.orivesolutions.com");
+    const result = await axios.get("http://localhost:3500");
     setGetData(result.data);
   };
 
@@ -170,10 +170,7 @@ const Signin = () => {
   const saveLogin = async (e) => {
     e.preventDefault();
     try {
-      const result = await axios.post(
-        "https://inv.orivesolutions.com",
-        formdata
-      );
+      const result = await axios.post("http://localhost:3500", formdata);
       if (result.data !== "failure") {
         const tokenData = jwtDecode(result.data.accessToken);
         if (tokenData) {
@@ -243,7 +240,7 @@ const Signin = () => {
   const handlePassword = async () => {
     if (updatedPassword === confirmPassword) {
       await axios
-        .put(`https://inv.orivesolutions.com/reset-password/${forgotEmail}`, {
+        .put(`http://localhost:3500/reset-password/${forgotEmail}`, {
           confirmPassword: confirmPassword,
         })
         .then(() => window.location.reload())

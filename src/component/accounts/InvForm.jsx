@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "../../Styles.css";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { IconButton } from "@mui/material";
 import AddCircleOutlineOutlinedIcon from "@mui/icons-material/AddCircleOutlineOutlined";
@@ -23,7 +23,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const InvForm = () => {
+const InvForm = ({ state }) => {
   const classes = useStyles();
   const [activeStep, setActiveStep] = useState(0);
   const steps = getSteps();
@@ -35,8 +35,7 @@ const InvForm = () => {
   const [totalInvValFcval, setTotalInvValFcVal] = useState(0);
   const [cesval, setCesVal] = useState(0);
   const [stCesval, setStCesVal] = useState(0);
-
-  const { state } = useLocation();
+  const [rndOffAmt, setRndOffAmt] = useState(0);
 
   const handleNext = () => {
     setActiveStep(activeStep + 1);
@@ -45,6 +44,8 @@ const InvForm = () => {
   const handleBack = () => {
     setActiveStep(activeStep - 1);
   };
+
+  const navigation = useNavigate();
 
   const [formData, setFormData] = useState({
     Version: "1.1",
@@ -64,32 +65,32 @@ const InvForm = () => {
     SellerDtls: {
       Gstin: "",
       LglNm: "",
-      TrdNm: "optional",
+      TrdNm: null,
       Addr1: "",
-      Addr2: "optional",
+      Addr2: null,
       Loc: "",
       Pin: 0,
       Stcd: "",
-      Ph: 0,
-      Em: "optional",
+      Ph: null,
+      Em: null,
     },
     BuyerDtls: {
       Gstin: "",
       LglNm: "",
-      TrdNm: "optional",
+      TrdNm: null,
       Pos: "",
       Addr1: "",
-      Addr2: "optional",
+      Addr2: null,
       Loc: "",
       Pin: 0,
       Stcd: "",
-      Ph: 0,
-      Em: "optional",
+      Ph: null,
+      Em: null,
     },
     DispDtls: {
       Nm: "",
       Addr1: "",
-      Addr2: "optional",
+      Addr2: null,
       Loc: "",
       Pin: 0,
       Stcd: "",
@@ -97,9 +98,9 @@ const InvForm = () => {
     ShipDtls: {
       Gstin: "",
       LglNm: "",
-      TrdNm: "optional",
+      TrdNm: null,
       Addr1: "",
-      Addr2: "optional",
+      Addr2: null,
       Loc: "",
       Pin: 0,
       Stcd: "",
@@ -108,9 +109,9 @@ const InvForm = () => {
       {
         SlNo: "",
         PrdDesc: "",
-        IsServc: "",
+        IsServc: "N",
         HsnCd: "",
-        Barcde: "",
+        Barcde: null,
         Qty: 0,
         FreeQty: 0,
         Unit: "",
@@ -131,9 +132,11 @@ const InvForm = () => {
         StateCesNonAdvlAmt: 0,
         OthChrg: 0,
         TotItemVal: 0,
-        OrdLineRef: "",
-        OrgCntry: "",
-        PrdSlNo: "",
+        OrdLineRef: null,
+        OrgCntry: null,
+        PrdSlNo: null,
+        BchDtls: null,
+        AttribDtls: null,
       },
     ],
     ValDtls: {
@@ -150,27 +153,31 @@ const InvForm = () => {
       TotInvValFc: 0,
     },
     PayDtls: {
-      Nm: "optional",
-      AccDet: 0,
-      Mode: "optional",
-      FinInsBr: "optional",
-      PayTerm: "optional",
-      PayInstr: "optional",
-      CrTrn: "optional",
-      DirDr: "optional",
-      CrDay: 0,
-      PaidAmt: 0,
-      PaymtDue: 0,
+      Nm: null,
+      AccDet: null,
+      Mode: null,
+      FinInsBr: null,
+      PayTerm: null,
+      PayInstr: null,
+      CrTrn: null,
+      DirDr: null,
+      CrDay: null,
+      PaidAmt: null,
+      PaymtDue: null,
     },
+    RefDtls: null,
+    PrecDocDtls: null,
+    ContrDtls: null,
+    AddlDocDtls: null,
     EwbDtls: {
-      TransId: "optional",
-      TransName: "optional",
-      TransMode: "",
-      Distance: 0,
-      TransDocNo: "optional",
-      TransDocDt: "optional",
-      VehNo: "optional",
-      VehType: "optional",
+      TransId: null,
+      TransName: null,
+      TransMode: null,
+      Distance: "",
+      TransDocNo: null,
+      TransDocDt: null,
+      VehNo: null,
+      VehType: null,
     },
   });
 
@@ -183,30 +190,52 @@ const InvForm = () => {
       },
     }));
   };
+
+  const [documentDate, setDocumentDate] = useState("");
   const handleDocInput = (e) => {
-    setFormData((prevState) => ({
-      ...prevState,
-      DocDtls: {
-        ...prevState.DocDtls,
-        [e.target.name]: e.target.value,
-      },
-    }));
+    if (e.target.name === "Dt") {
+      const parsedDate = new Date(e.target.value);
+      setDocumentDate(e.target.value);
+      const day = parsedDate.getDate().toString().padStart(2, "0"); // Add leading zero if needed
+      const month = (parsedDate.getMonth() + 1).toString().padStart(2, "0"); // Month is zero-based
+      const year = parsedDate.getFullYear();
+
+      const formattedDate = `${day}/${month}/${year}`;
+      setFormData((prevState) => ({
+        ...prevState,
+        DocDtls: {
+          ...prevState.DocDtls,
+          [e.target.name]: formattedDate,
+        },
+      }));
+    } else {
+      setFormData((prevState) => ({
+        ...prevState,
+        DocDtls: {
+          ...prevState.DocDtls,
+          [e.target.name]: e.target.value,
+        },
+      }));
+    }
   };
   const handleSellerInput = (e) => {
+    const { name, value } = e.target;
     setFormData((prevState) => ({
       ...prevState,
       SellerDtls: {
         ...prevState.SellerDtls,
-        [e.target.name]: e.target.value,
+        [name]: value,
       },
     }));
   };
+
   const handleBuyerInput = (e) => {
+    const { name, value } = e.target;
     setFormData((prevState) => ({
       ...prevState,
       BuyerDtls: {
         ...prevState.BuyerDtls,
-        [e.target.name]: e.target.value,
+        [name]: value,
       },
     }));
   };
@@ -237,23 +266,36 @@ const InvForm = () => {
       },
     }));
   };
+
+  const [transDocDate, setTransDocDate] = useState(null);
   const handleEwabInput = (e) => {
-    setFormData((prevState) => ({
-      ...prevState,
-      EwbDtls: {
-        ...prevState.EwbDtls,
-        [e.target.name]: e.target.value,
-      },
-    }));
+    if (e.target.name === "TransDocDt") {
+      const parsedDate = new Date(e.target.value);
+      setTransDocDate(e.target.value);
+      const day = parsedDate.getDate().toString().padStart(2, "0"); // Add leading zero if needed
+      const month = (parsedDate.getMonth() + 1).toString().padStart(2, "0"); // Month is zero-based
+      const year = parsedDate.getFullYear();
+
+      const formattedDate = `${day}/${month}/${year}`;
+      setFormData((prevState) => ({
+        ...prevState,
+        EwbDtls: {
+          ...prevState.EwbDtls,
+          [e.target.name]: formattedDate,
+        },
+      }));
+    } else {
+      setFormData((prevState) => ({
+        ...prevState,
+        EwbDtls: {
+          ...prevState.EwbDtls,
+          [e.target.name]: e.target.value,
+        },
+      }));
+    }
   };
   const handleValInput = (e) => {
-    setFormData((prevState) => ({
-      ...prevState,
-      ValDtls: {
-        ...prevState.ValDtls,
-        [e.target.name]: e.target.value,
-      },
-    }));
+    setRndOffAmt(e.target.value);
   };
 
   const [item, setItem] = useState([]);
@@ -266,7 +308,7 @@ const InvForm = () => {
             ...elem,
             [e.target.name]: e.target.value,
             ["TotItemVal"]: elem.UnitPrice,
-            ["SlNo"]: item.length,
+            ["SlNo"]: `${item.length}`,
           }
         : elem;
     });
@@ -306,14 +348,21 @@ const InvForm = () => {
         parseFloat(elem.StateCesNonAdvlAmt || 0)
       );
     }, 0);
-    setAssVal(calcAssVal);
-    setCgstVal(calcCgstVal);
-    setSgstVal(calcSgstVal);
-    setIgstVal(calcIgstVal);
-    setDiscountVal(calcDiscount);
-    setTotalInvValFcVal(calcTotInvValFc);
-    setCesVal(calcCesVal);
-    setStCesVal(calcStCesVal);
+    setAssVal(calcAssVal.toFixed(2));
+    if (movementType === "one") {
+      setCgstVal(0);
+      setSgstVal(0);
+      setIgstVal(calcIgstVal.toFixed(2));
+    } else {
+      setCgstVal(calcCgstVal.toFixed(2));
+      setSgstVal(calcSgstVal.toFixed(2));
+      setIgstVal(0);
+    }
+
+    setDiscountVal(calcDiscount.toFixed(2));
+    setTotalInvValFcVal(calcTotInvValFc.toFixed(2));
+    setCesVal(calcCesVal.toFixed(2));
+    setStCesVal(calcStCesVal.toFixed(2));
   });
 
   useEffect(() => {
@@ -335,19 +384,22 @@ const InvForm = () => {
       if (calculatedAmount !== elem.TotItemVal) {
         return {
           ...elem,
-          TotItemVal:
-            calculatedAmount +
+          TotItemVal: (
+            calculatedAmount -
+            discount +
             cessAmt +
             stateCesAmt +
             parseFloat(elem.CesNonAdvlAmt) +
-            parseFloat(elem.StateCesNonAdvlAmt),
-          TotAmt: withoutGstAmt,
-          IgstAmt: igst,
-          CgstAmt: cgst,
-          SgstAmt: sgst,
+            parseFloat(elem.StateCesNonAdvlAmt)
+          ).toFixed(2),
+          TotAmt: withoutGstAmt.toFixed(2),
+          IgstAmt: movementType === "one" ? igst.toFixed(2) : 0,
+          CgstAmt: movementType === "one" ? 0 : cgst.toFixed(2),
+          SgstAmt: movementType === "one" ? 0 : sgst.toFixed(2),
+          PreTaxVal: withoutGstAmt - discount,
           AssAmt: withoutGstAmt - discount,
-          StateCesAmt: stateCesAmt,
-          CesAmt: cessAmt,
+          StateCesAmt: stateCesAmt.toFixed(2),
+          CesAmt: cessAmt.toFixed(2),
         };
       }
       return elem;
@@ -374,7 +426,11 @@ const InvForm = () => {
         CesVal: cesval,
         StCesVal: stCesval,
         Discount: discountval,
-        TotInvVal: totalInvValFcval + discountval,
+        RndOffAmt: rndOffAmt ? parseFloat(rndOffAmt) : 0,
+        TotInvVal:
+          totalInvValFcval -
+          discountval +
+          parseFloat(rndOffAmt ? rndOffAmt : 0),
         TotInvValFc: totalInvValFcval,
       },
     }));
@@ -386,6 +442,7 @@ const InvForm = () => {
     stCesval,
     discountval,
     totalInvValFcval,
+    rndOffAmt,
   ]);
 
   const deleteRow = (id) => {
@@ -400,9 +457,9 @@ const InvForm = () => {
       id: new Date().getTime().toString(),
       SlNo: "",
       PrdDesc: "",
-      IsServc: "",
+      IsServc: "N",
       HsnCd: "",
-      Barcde: "",
+      Barcde: null,
       Qty: 0,
       FreeQty: 0,
       Unit: "",
@@ -423,13 +480,15 @@ const InvForm = () => {
       StateCesNonAdvlAmt: 0,
       OthChrg: 0,
       TotItemVal: 0,
-      OrdLineRef: "",
-      OrgCntry: "",
-      PrdSlNo: "",
+      OrdLineRef: null,
+      OrgCntry: null,
+      PrdSlNo: null,
     };
     setItem([...item, newItem]);
     setID(newItem.id);
   };
+
+  const [movementType, setMovementType] = useState(null);
 
   function getSteps() {
     return [
@@ -500,7 +559,6 @@ const InvForm = () => {
                   type="text"
                   class="form-control"
                   id="exampleInputEmail1"
-                  aria-describedby="emailHelp"
                   name="No"
                   value={formData.DocDtls.No}
                   onChange={(e) => handleDocInput(e)}
@@ -514,9 +572,8 @@ const InvForm = () => {
                   type="date"
                   class="form-control"
                   id="Dt"
-                  aria-describedby="emailHelp"
                   name="Dt"
-                  value={formData.DocDtls.Dt}
+                  value={documentDate}
                   onChange={(e) => handleDocInput(e)}
                 />
               </div>
@@ -536,7 +593,6 @@ const InvForm = () => {
                   type="text"
                   class="form-control"
                   id="LglNm"
-                  aria-describedby="emailHelp"
                   name="LglNm"
                   value={formData.SellerDtls.LglNm}
                   onChange={(e) => handleSellerInput(e)}
@@ -550,28 +606,38 @@ const InvForm = () => {
                   type="text"
                   class="form-control"
                   id="TrdNm"
-                  aria-describedby="emailHelp"
                   name="TrdNm"
-                  value={formData.SellerDtls.TrdNm}
+                  value={
+                    formData.SellerDtls.TrdNm ? formData.SellerDtls.TrdNm : ""
+                  }
                   onChange={(e) => handleSellerInput(e)}
                 />
               </div>
             </div>
             <div className="data-input-fields">
-              <div class="mb-2 w-50">
-                <label for="Gstin" class="form-label">
+              <div className="mb-2 w-50">
+                <label htmlFor="Gstin" className="form-label">
                   Supplier GSTIN **
                 </label>
                 <input
                   type="text"
-                  class="form-control"
+                  className={`form-control`}
                   id="Gstin"
-                  aria-describedby="emailHelp"
                   name="Gstin"
                   value={formData.SellerDtls.Gstin}
-                  onChange={(e) => handleSellerInput(e)}
+                  onChange={(e) => {
+                    handleSellerInput(e);
+                  }}
+                  maxLength={15}
                 />
+                {formData.SellerDtls.Gstin.length != "" &&
+                  formData.SellerDtls.Gstin.length < 15 && (
+                    <div style={{ color: "red" }}>
+                      GSTIN should be 15 characters.
+                    </div>
+                  )}
               </div>
+
               <div class="mb-2 w-50">
                 <label for="Addr1" class="form-label">
                   Supplier Address 1 **
@@ -580,7 +646,6 @@ const InvForm = () => {
                   type="text"
                   class="form-control"
                   id="Addr1"
-                  aria-describedby="emailHelp"
                   name="Addr1"
                   value={formData.SellerDtls.Addr1}
                   onChange={(e) => handleSellerInput(e)}
@@ -596,9 +661,10 @@ const InvForm = () => {
                   type="text"
                   class="form-control"
                   id="Addr2"
-                  aria-describedby="emailHelp"
                   name="Addr2"
-                  value={formData.SellerDtls.Addr2}
+                  value={
+                    formData.SellerDtls.Addr2 ? formData.SellerDtls.Addr2 : ""
+                  }
                   onChange={(e) => handleSellerInput(e)}
                 />
               </div>
@@ -610,7 +676,6 @@ const InvForm = () => {
                   type="text"
                   class="form-control"
                   id="Loc"
-                  aria-describedby="emailHelp"
                   name="Loc"
                   value={formData.SellerDtls.Loc}
                   onChange={(e) => handleSellerInput(e)}
@@ -618,19 +683,56 @@ const InvForm = () => {
               </div>
             </div>
             <div className="data-input-fields">
-              <div class="mb-2 w-50">
-                <label for="Stcd" class="form-label">
+              <div className="mb-2 w-50">
+                <label htmlFor="Pos" className="form-label">
                   Supplier State Code **
                 </label>
-                <input
-                  type="text"
-                  class="form-control"
-                  id="Stcd"
-                  aria-describedby="emailHelp"
+                <select
+                  className="form-select"
+                  id="Typ"
                   name="Stcd"
                   value={formData.SellerDtls.Stcd}
                   onChange={(e) => handleSellerInput(e)}
-                />
+                >
+                  <option value="">Select State</option>
+                  <option value="01">01 - Jammu & Kashmir</option>
+                  <option value="02">02 - Himachal Pradesh</option>
+                  <option value="03">03 - Punjab</option>
+                  <option value="04">04 - Chandigarh</option>
+                  <option value="05">05 - Uttarakhand</option>
+                  <option value="06">06 - Haryana</option>
+                  <option value="07">07 - Delhi</option>
+                  <option value="08">08 - Rajasthan</option>
+                  <option value="09">09 - Uttar Pradesh</option>
+                  <option value="10">10 - Bihar</option>
+                  <option value="11">11 - Sikkim</option>
+                  <option value="12">12 - Arunachal Pradesh</option>
+                  <option value="13">13 - Nagaland</option>
+                  <option value="14">14 - Manipur</option>
+                  <option value="15">15 - Mizoram</option>
+                  <option value="16">16 - Tripura</option>
+                  <option value="17">17 - Meghalaya</option>
+                  <option value="18">18 - Assam</option>
+                  <option value="19">19 - West Bengal</option>
+                  <option value="20">20 - Jharkhand</option>
+                  <option value="21">21 - Orissa</option>
+                  <option value="22">22 - Chhattisgarh</option>
+                  <option value="23">23 - Madhya Pradesh</option>
+                  <option value="24">24 - Gujarat</option>
+                  <option value="25">25 - Daman & Diu</option>
+                  <option value="26">26 - Dadra & Nagar Haveli</option>
+                  <option value="27">27 - Maharashtra</option>
+                  <option value="28">28 - Andhra Pradesh (Old)</option>
+                  <option value="29">29 - Karnataka</option>
+                  <option value="30">30 - Goa</option>
+                  <option value="31">31 - Lakshadweep</option>
+                  <option value="32">32 - Kerala</option>
+                  <option value="33">33 - Tamil Nadu</option>
+                  <option value="34">34 - Puducherry</option>
+                  <option value="35">35 - Andaman & Nicobar Islands</option>
+                  <option value="36">36 - Telangana</option>
+                  <option value="37">37 - Andhra Pradesh (New)</option>
+                </select>
               </div>
               <div class="mb-2 w-50">
                 <label for="Pin" class="form-label">
@@ -638,13 +740,22 @@ const InvForm = () => {
                 </label>
                 <input
                   type="number"
-                  class="form-control"
+                  className="form-control"
                   id="Pin"
-                  aria-describedby="emailHelp"
                   name="Pin"
                   value={formData.SellerDtls.Pin}
-                  onChange={(e) => handleSellerInput(e)}
+                  onChange={(e) => {
+                    const inputValue = e.target.value;
+                    if (inputValue.length <= 6) {
+                      handleSellerInput(e);
+                    }
+                  }}
                 />
+                {formData.SellerDtls.Pin.length < 6 && (
+                  <div style={{ color: "red" }}>
+                    Pincode should be 6 digits.
+                  </div>
+                )}
               </div>
             </div>
             <div className="data-input-fields">
@@ -656,11 +767,21 @@ const InvForm = () => {
                   type="number"
                   class="form-control"
                   id="Ph"
-                  aria-describedby="emailHelp"
                   name="Ph"
-                  value={formData.SellerDtls.Ph}
-                  onChange={(e) => handleSellerInput(e)}
+                  value={formData.SellerDtls.Ph ? formData.SellerDtls.Ph : ""}
+                  onChange={(e) => {
+                    const inputValue = e.target.value;
+                    if (inputValue.length <= 10) {
+                      handleSellerInput(e);
+                    }
+                  }}
                 />
+                {formData.SellerDtls.Ph &&
+                  formData.SellerDtls.Ph.length < 10 && (
+                    <div style={{ color: "red" }}>
+                      Number should be 10 digits.
+                    </div>
+                  )}
               </div>
               <div class="mb-2 w-50">
                 <label for="Em" class="form-label">
@@ -670,9 +791,8 @@ const InvForm = () => {
                   type="email"
                   class="form-control"
                   id="Em"
-                  aria-describedby="emailHelp"
                   name="Em"
-                  value={formData.SellerDtls.Em}
+                  value={formData.SellerDtls.Em ? formData.SellerDtls.Em : ""}
                   onChange={(e) => handleSellerInput(e)}
                 />
               </div>
@@ -691,7 +811,6 @@ const InvForm = () => {
                   type="text"
                   class="form-control"
                   id="LglNm"
-                  aria-describedby="emailHelp"
                   name="LglNm"
                   value={formData.BuyerDtls.LglNm}
                   onChange={(e) => handleBuyerInput(e)}
@@ -705,9 +824,10 @@ const InvForm = () => {
                   type="text"
                   class="form-control"
                   id="TrdNm"
-                  aria-describedby="emailHelp"
                   name="TrdNm"
-                  value={formData.BuyerDtls.TrdNm}
+                  value={
+                    formData.BuyerDtls.TrdNm ? formData.BuyerDtls.TrdNm : ""
+                  }
                   onChange={(e) => handleBuyerInput(e)}
                 />
               </div>
@@ -721,11 +841,17 @@ const InvForm = () => {
                   type="text"
                   class="form-control"
                   id="Gstin"
-                  aria-describedby="emailHelp"
                   name="Gstin"
                   value={formData.BuyerDtls.Gstin}
                   onChange={(e) => handleBuyerInput(e)}
+                  maxLength={15}
                 />
+                {formData.BuyerDtls.Gstin.length != "" &&
+                  formData.BuyerDtls.Gstin.length < 15 && (
+                    <div style={{ color: "red" }}>
+                      GSTIN should be 15 characters.
+                    </div>
+                  )}
               </div>
               <div className="mb-2 w-50">
                 <label htmlFor="Pos" className="form-label">
@@ -786,7 +912,6 @@ const InvForm = () => {
                   type="text"
                   class="form-control"
                   id="Addr1"
-                  aria-describedby="emailHelp"
                   name="Addr1"
                   value={formData.BuyerDtls.Addr1}
                   onChange={(e) => handleBuyerInput(e)}
@@ -802,9 +927,10 @@ const InvForm = () => {
                   type="text"
                   class="form-control"
                   id="Addr2"
-                  aria-describedby="emailHelp"
                   name="Addr2"
-                  value={formData.BuyerDtls.Addr2}
+                  value={
+                    formData.BuyerDtls.Addr2 ? formData.BuyerDtls.Addr2 : ""
+                  }
                   onChange={(e) => handleBuyerInput(e)}
                 />
               </div>
@@ -816,7 +942,6 @@ const InvForm = () => {
                   type="text"
                   class="form-control"
                   id="Loc"
-                  aria-describedby="emailHelp"
                   name="Loc"
                   value={formData.BuyerDtls.Loc}
                   onChange={(e) => handleBuyerInput(e)}
@@ -824,19 +949,56 @@ const InvForm = () => {
               </div>
             </div>
             <div className="data-input-fields">
-              <div class="mb-2 w-50">
-                <label for="Stcd" class="form-label">
+              <div className="mb-2 w-50">
+                <label htmlFor="Pos" className="form-label">
                   Buyer State Code **
                 </label>
-                <input
-                  type="text"
-                  class="form-control"
-                  id="Stcd"
-                  aria-describedby="emailHelp"
+                <select
+                  className="form-select"
+                  id="Typ"
                   name="Stcd"
                   value={formData.BuyerDtls.Stcd}
                   onChange={(e) => handleBuyerInput(e)}
-                />
+                >
+                  <option value="">Select State</option>
+                  <option value="01">01 - Jammu & Kashmir</option>
+                  <option value="02">02 - Himachal Pradesh</option>
+                  <option value="03">03 - Punjab</option>
+                  <option value="04">04 - Chandigarh</option>
+                  <option value="05">05 - Uttarakhand</option>
+                  <option value="06">06 - Haryana</option>
+                  <option value="07">07 - Delhi</option>
+                  <option value="08">08 - Rajasthan</option>
+                  <option value="09">09 - Uttar Pradesh</option>
+                  <option value="10">10 - Bihar</option>
+                  <option value="11">11 - Sikkim</option>
+                  <option value="12">12 - Arunachal Pradesh</option>
+                  <option value="13">13 - Nagaland</option>
+                  <option value="14">14 - Manipur</option>
+                  <option value="15">15 - Mizoram</option>
+                  <option value="16">16 - Tripura</option>
+                  <option value="17">17 - Meghalaya</option>
+                  <option value="18">18 - Assam</option>
+                  <option value="19">19 - West Bengal</option>
+                  <option value="20">20 - Jharkhand</option>
+                  <option value="21">21 - Orissa</option>
+                  <option value="22">22 - Chhattisgarh</option>
+                  <option value="23">23 - Madhya Pradesh</option>
+                  <option value="24">24 - Gujarat</option>
+                  <option value="25">25 - Daman & Diu</option>
+                  <option value="26">26 - Dadra & Nagar Haveli</option>
+                  <option value="27">27 - Maharashtra</option>
+                  <option value="28">28 - Andhra Pradesh (Old)</option>
+                  <option value="29">29 - Karnataka</option>
+                  <option value="30">30 - Goa</option>
+                  <option value="31">31 - Lakshadweep</option>
+                  <option value="32">32 - Kerala</option>
+                  <option value="33">33 - Tamil Nadu</option>
+                  <option value="34">34 - Puducherry</option>
+                  <option value="35">35 - Andaman & Nicobar Islands</option>
+                  <option value="36">36 - Telangana</option>
+                  <option value="37">37 - Andhra Pradesh (New)</option>
+                </select>
               </div>
               <div class="mb-2 w-50">
                 <label for="Pin" class="form-label">
@@ -846,11 +1008,20 @@ const InvForm = () => {
                   type="number"
                   class="form-control"
                   id="Pin"
-                  aria-describedby="emailHelp"
                   name="Pin"
                   value={formData.BuyerDtls.Pin}
-                  onChange={(e) => handleBuyerInput(e)}
+                  onChange={(e) => {
+                    const inputValue = e.target.value;
+                    if (inputValue.length <= 6) {
+                      handleBuyerInput(e);
+                    }
+                  }}
                 />
+                {formData.BuyerDtls.Pin.length < 6 && (
+                  <div style={{ color: "red" }}>
+                    Pincode should be 6 digits.
+                  </div>
+                )}
               </div>
             </div>
             <div className="data-input-fields">
@@ -859,14 +1030,24 @@ const InvForm = () => {
                   Buyer Phone
                 </label>
                 <input
-                  type="number"
+                  type="text"
                   class="form-control"
                   id="Ph"
-                  aria-describedby="emailHelp"
+                  maxLength={10}
                   name="Ph"
-                  value={formData.BuyerDtls.Ph}
-                  onChange={(e) => handleBuyerInput(e)}
+                  value={formData.BuyerDtls.Ph ? formData.BuyerDtls.Ph : ""}
+                  onChange={(e) => {
+                    const inputValue = e.target.value;
+                    if (inputValue.length <= 10) {
+                      handleBuyerInput(e);
+                    }
+                  }}
                 />
+                {formData.BuyerDtls.Ph && formData.BuyerDtls.Ph.length < 10 && (
+                  <div style={{ color: "red" }}>
+                    Number should be 10 digits.
+                  </div>
+                )}
               </div>
               <div class="mb-2 w-50">
                 <label for="Em" class="form-label">
@@ -876,9 +1057,8 @@ const InvForm = () => {
                   type="email"
                   class="form-control"
                   id="Em"
-                  aria-describedby="emailHelp"
                   name="Em"
-                  value={formData.BuyerDtls.Em}
+                  value={formData.BuyerDtls.Em ? formData.BuyerDtls.Em : ""}
                   onChange={(e) => handleBuyerInput(e)}
                 />
               </div>
@@ -897,7 +1077,6 @@ const InvForm = () => {
                   type="text"
                   class="form-control"
                   id="Nm"
-                  aria-describedby="emailHelp"
                   name="Nm"
                   value={formData.DispDtls.Nm}
                   onChange={(e) => handleDispInput(e)}
@@ -911,7 +1090,6 @@ const InvForm = () => {
                   type="text"
                   class="form-control"
                   id="Addr1"
-                  aria-describedby="emailHelp"
                   name="Addr1"
                   value={formData.DispDtls.Addr1}
                   onChange={(e) => handleDispInput(e)}
@@ -927,9 +1105,8 @@ const InvForm = () => {
                   type="text"
                   class="form-control"
                   id="Addr2"
-                  aria-describedby="emailHelp"
                   name="Addr2"
-                  value={formData.DispDtls.Addr2}
+                  value={formData.DispDtls.Addr2 ? formData.DispDtls.Addr2 : ""}
                   onChange={(e) => handleDispInput(e)}
                 />
               </div>
@@ -941,7 +1118,6 @@ const InvForm = () => {
                   type="text"
                   class="form-control"
                   id="Loc"
-                  aria-describedby="emailHelp"
                   name="Loc"
                   value={formData.DispDtls.Loc}
                   onChange={(e) => handleDispInput(e)}
@@ -949,19 +1125,56 @@ const InvForm = () => {
               </div>
             </div>
             <div className="data-input-fields">
-              <div class="mb-2 w-50">
-                <label for="Stcd" class="form-label">
+              <div className="mb-2 w-50">
+                <label htmlFor="Pos" className="form-label">
                   Dispatch from State Code **
                 </label>
-                <input
-                  type="text"
-                  class="form-control"
-                  id="Stcd"
-                  aria-describedby="emailHelp"
+                <select
+                  className="form-select"
+                  id="Typ"
                   name="Stcd"
                   value={formData.DispDtls.Stcd}
                   onChange={(e) => handleDispInput(e)}
-                />
+                >
+                  <option value="">Select State</option>
+                  <option value="01">01 - Jammu & Kashmir</option>
+                  <option value="02">02 - Himachal Pradesh</option>
+                  <option value="03">03 - Punjab</option>
+                  <option value="04">04 - Chandigarh</option>
+                  <option value="05">05 - Uttarakhand</option>
+                  <option value="06">06 - Haryana</option>
+                  <option value="07">07 - Delhi</option>
+                  <option value="08">08 - Rajasthan</option>
+                  <option value="09">09 - Uttar Pradesh</option>
+                  <option value="10">10 - Bihar</option>
+                  <option value="11">11 - Sikkim</option>
+                  <option value="12">12 - Arunachal Pradesh</option>
+                  <option value="13">13 - Nagaland</option>
+                  <option value="14">14 - Manipur</option>
+                  <option value="15">15 - Mizoram</option>
+                  <option value="16">16 - Tripura</option>
+                  <option value="17">17 - Meghalaya</option>
+                  <option value="18">18 - Assam</option>
+                  <option value="19">19 - West Bengal</option>
+                  <option value="20">20 - Jharkhand</option>
+                  <option value="21">21 - Orissa</option>
+                  <option value="22">22 - Chhattisgarh</option>
+                  <option value="23">23 - Madhya Pradesh</option>
+                  <option value="24">24 - Gujarat</option>
+                  <option value="25">25 - Daman & Diu</option>
+                  <option value="26">26 - Dadra & Nagar Haveli</option>
+                  <option value="27">27 - Maharashtra</option>
+                  <option value="28">28 - Andhra Pradesh (Old)</option>
+                  <option value="29">29 - Karnataka</option>
+                  <option value="30">30 - Goa</option>
+                  <option value="31">31 - Lakshadweep</option>
+                  <option value="32">32 - Kerala</option>
+                  <option value="33">33 - Tamil Nadu</option>
+                  <option value="34">34 - Puducherry</option>
+                  <option value="35">35 - Andaman & Nicobar Islands</option>
+                  <option value="36">36 - Telangana</option>
+                  <option value="37">37 - Andhra Pradesh (New)</option>
+                </select>
               </div>
               <div class="mb-2 w-50">
                 <label for="Pin" class="form-label">
@@ -971,11 +1184,20 @@ const InvForm = () => {
                   type="number"
                   class="form-control"
                   id="Pin"
-                  aria-describedby="emailHelp"
                   name="Pin"
                   value={formData.DispDtls.Pin}
-                  onChange={(e) => handleDispInput(e)}
+                  onChange={(e) => {
+                    const inputValue = e.target.value;
+                    if (inputValue.length <= 6) {
+                      handleDispInput(e);
+                    }
+                  }}
                 />
+                {formData.DispDtls.Pin.length < 6 && (
+                  <div style={{ color: "red" }}>
+                    Pincode should be 6 characters.
+                  </div>
+                )}
               </div>
             </div>
           </>
@@ -993,7 +1215,6 @@ const InvForm = () => {
                   type="text"
                   class="form-control"
                   id="LglNm"
-                  aria-describedby="emailHelp"
                   name="LglNm"
                   value={formData.ShipDtls.LglNm}
                   onChange={(e) => handleShipInput(e)}
@@ -1007,9 +1228,8 @@ const InvForm = () => {
                   type="text"
                   class="form-control"
                   id="TrdNm"
-                  aria-describedby="emailHelp"
                   name="TrdNm"
-                  value={formData.ShipDtls.TrdNm}
+                  value={formData.ShipDtls.TrdNm ? formData.ShipDtls.TrdNm : ""}
                   onChange={(e) => handleShipInput(e)}
                 />
               </div>
@@ -1023,11 +1243,17 @@ const InvForm = () => {
                   type="text"
                   class="form-control"
                   id="Gstin"
-                  aria-describedby="emailHelp"
                   name="Gstin"
                   value={formData.ShipDtls.Gstin}
                   onChange={(e) => handleShipInput(e)}
+                  maxLength={15}
                 />
+                {formData.ShipDtls.Gstin.length != "" &&
+                  formData.ShipDtls.Gstin.length < 15 && (
+                    <div style={{ color: "red" }}>
+                      GSTIN should be 15 characters.
+                    </div>
+                  )}
               </div>
               <div class="mb-2 w-50">
                 <label for="Addr1" class="form-label">
@@ -1037,7 +1263,6 @@ const InvForm = () => {
                   type="text"
                   class="form-control"
                   id="Addr1"
-                  aria-describedby="emailHelp"
                   name="Addr1"
                   value={formData.ShipDtls.Addr1}
                   onChange={(e) => handleShipInput(e)}
@@ -1053,9 +1278,8 @@ const InvForm = () => {
                   type="text"
                   class="form-control"
                   id="Addr2"
-                  aria-describedby="emailHelp"
                   name="Addr2"
-                  value={formData.ShipDtls.Addr2}
+                  value={formData.ShipDtls.Addr2 ? formData.ShipDtls.Addr2 : ""}
                   onChange={(e) => handleShipInput(e)}
                 />
               </div>
@@ -1067,7 +1291,6 @@ const InvForm = () => {
                   type="text"
                   class="form-control"
                   id="Loc"
-                  aria-describedby="emailHelp"
                   name="Loc"
                   value={formData.ShipDtls.Loc}
                   onChange={(e) => handleShipInput(e)}
@@ -1075,19 +1298,56 @@ const InvForm = () => {
               </div>
             </div>
             <div className="data-input-fields">
-              <div class="mb-2 w-50">
-                <label for="Stcd" class="form-label">
+              <div className="mb-2 w-50">
+                <label htmlFor="Pos" className="form-label">
                   Ship to State Code **
                 </label>
-                <input
-                  type="text"
-                  class="form-control"
-                  id="Stcd"
-                  aria-describedby="emailHelp"
+                <select
+                  className="form-select"
+                  id="Typ"
                   name="Stcd"
                   value={formData.ShipDtls.Stcd}
                   onChange={(e) => handleShipInput(e)}
-                />
+                >
+                  <option value="">Select State</option>
+                  <option value="01">01 - Jammu & Kashmir</option>
+                  <option value="02">02 - Himachal Pradesh</option>
+                  <option value="03">03 - Punjab</option>
+                  <option value="04">04 - Chandigarh</option>
+                  <option value="05">05 - Uttarakhand</option>
+                  <option value="06">06 - Haryana</option>
+                  <option value="07">07 - Delhi</option>
+                  <option value="08">08 - Rajasthan</option>
+                  <option value="09">09 - Uttar Pradesh</option>
+                  <option value="10">10 - Bihar</option>
+                  <option value="11">11 - Sikkim</option>
+                  <option value="12">12 - Arunachal Pradesh</option>
+                  <option value="13">13 - Nagaland</option>
+                  <option value="14">14 - Manipur</option>
+                  <option value="15">15 - Mizoram</option>
+                  <option value="16">16 - Tripura</option>
+                  <option value="17">17 - Meghalaya</option>
+                  <option value="18">18 - Assam</option>
+                  <option value="19">19 - West Bengal</option>
+                  <option value="20">20 - Jharkhand</option>
+                  <option value="21">21 - Orissa</option>
+                  <option value="22">22 - Chhattisgarh</option>
+                  <option value="23">23 - Madhya Pradesh</option>
+                  <option value="24">24 - Gujarat</option>
+                  <option value="25">25 - Daman & Diu</option>
+                  <option value="26">26 - Dadra & Nagar Haveli</option>
+                  <option value="27">27 - Maharashtra</option>
+                  <option value="28">28 - Andhra Pradesh (Old)</option>
+                  <option value="29">29 - Karnataka</option>
+                  <option value="30">30 - Goa</option>
+                  <option value="31">31 - Lakshadweep</option>
+                  <option value="32">32 - Kerala</option>
+                  <option value="33">33 - Tamil Nadu</option>
+                  <option value="34">34 - Puducherry</option>
+                  <option value="35">35 - Andaman & Nicobar Islands</option>
+                  <option value="36">36 - Telangana</option>
+                  <option value="37">37 - Andhra Pradesh (New)</option>
+                </select>
               </div>
               <div class="mb-2 w-50">
                 <label for="Pin" class="form-label">
@@ -1097,11 +1357,20 @@ const InvForm = () => {
                   type="number"
                   class="form-control"
                   id="Pin"
-                  aria-describedby="emailHelp"
                   name="Pin"
                   value={formData.ShipDtls.Pin}
-                  onChange={(e) => handleShipInput(e)}
+                  onChange={(e) => {
+                    const inputValue = e.target.value;
+                    if (inputValue.length <= 6) {
+                      handleShipInput(e);
+                    }
+                  }}
                 />
+                {formData.ShipDtls.Pin.length < 6 && (
+                  <div style={{ color: "red" }}>
+                    Pincode should be 6 characters.
+                  </div>
+                )}
               </div>
             </div>
           </>
@@ -1112,12 +1381,27 @@ const InvForm = () => {
             <div
               className="salesviewtable"
               style={{
-                marginTop: "50px",
                 display: "flex",
                 flexDirection: "column",
                 gap: 20,
               }}
             >
+              <div className="mb-2 w-50">
+                <label htmlFor="MovTyp" className="form-label">
+                  Movement Type
+                </label>
+                <select
+                  style={{ width: "50%" }}
+                  className="form-select"
+                  id="MovTyp"
+                  value={movementType}
+                  onChange={(e) => setMovementType(e.target.value)}
+                >
+                  <option value="">Select Movement Type</option>
+                  <option value="one">Inter State</option>
+                  <option value="two">Intra State</option>
+                </select>
+              </div>
               <div className="table-wrapper">
                 {" "}
                 <table className="table">
@@ -1125,7 +1409,6 @@ const InvForm = () => {
                     <tr>
                       <th>NO</th>
                       <th>Product</th>
-                      <th>Service</th>
                       <th>HSN Code</th>
                       <th>Qty</th>
                       <th>Unit</th>
@@ -1152,14 +1435,7 @@ const InvForm = () => {
                             onChange={(e) => handleItemChange(e, row.id)}
                           />
                         </td>
-                        <td>
-                          <TextField
-                            name="IsServc"
-                            type="text"
-                            value={row.IsServc}
-                            onChange={(e) => handleItemChange(e, row.id)}
-                          />
-                        </td>
+
                         <td>
                           <TextField
                             type="text"
@@ -1274,6 +1550,7 @@ const InvForm = () => {
                 variant="outlined"
                 startIcon={<AddCircleOutlineOutlinedIcon />}
                 onClick={addItem}
+                disabled={movementType ? false : true}
               >
                 Add
               </Button>
@@ -1293,7 +1570,6 @@ const InvForm = () => {
                   type="number"
                   class="form-control"
                   id="AssVal"
-                  aria-describedby="emailHelp"
                   name="AssVal"
                   value={formData.ValDtls.AssVal}
                   disabled
@@ -1308,7 +1584,6 @@ const InvForm = () => {
                   type="number"
                   class="form-control"
                   id="CgstVal"
-                  aria-describedby="emailHelp"
                   name="CgstVal"
                   value={formData.ValDtls.CgstVal}
                   disabled
@@ -1325,7 +1600,6 @@ const InvForm = () => {
                   type="number"
                   class="form-control"
                   id="SgstVal"
-                  aria-describedby="emailHelp"
                   name="SgstVal"
                   value={formData.ValDtls.SgstVal}
                   disabled
@@ -1340,7 +1614,6 @@ const InvForm = () => {
                   type="number"
                   class="form-control"
                   id="IgstVal"
-                  aria-describedby="emailHelp"
                   name="IgstVal"
                   value={formData.ValDtls.IgstVal}
                   disabled
@@ -1357,7 +1630,6 @@ const InvForm = () => {
                   type="number"
                   class="form-control"
                   id="CesVal"
-                  aria-describedby="emailHelp"
                   name="CesVal"
                   value={formData.ValDtls.CesVal}
                   disabled
@@ -1372,7 +1644,6 @@ const InvForm = () => {
                   type="number"
                   class="form-control"
                   id="StCesVal"
-                  aria-describedby="emailHelp"
                   name="StCesVal"
                   value={formData.ValDtls.StCesVal}
                   disabled
@@ -1389,7 +1660,6 @@ const InvForm = () => {
                   type="number"
                   class="form-control"
                   id="Discount"
-                  aria-describedby="emailHelp"
                   name="Discount"
                   value={formData.ValDtls.Discount}
                   disabled
@@ -1404,9 +1674,8 @@ const InvForm = () => {
                   type="number"
                   class="form-control"
                   id="RndOffAmt"
-                  aria-describedby="emailHelp"
                   name="RndOffAmt"
-                  value={formData.ValDtls.RndOffAmt}
+                  value={rndOffAmt}
                   onChange={(e) => handleValInput(e)}
                 />
               </div>
@@ -1420,7 +1689,6 @@ const InvForm = () => {
                   type="number"
                   class="form-control"
                   id="TotInvVal"
-                  aria-describedby="emailHelp"
                   name="TotInvVal"
                   value={formData.ValDtls.TotInvVal}
                   disabled
@@ -1435,7 +1703,6 @@ const InvForm = () => {
                   type="number"
                   class="form-control"
                   id="TotInvValFc"
-                  aria-describedby="emailHelp"
                   name="TotInvValFc"
                   value={formData.ValDtls.TotInvValFc}
                   disabled
@@ -1458,9 +1725,8 @@ const InvForm = () => {
                   type="text"
                   class="form-control"
                   id="Nm"
-                  aria-describedby="emailHelp"
                   name="Nm"
-                  value={formData.PayDtls.Nm}
+                  value={formData.PayDtls.Nm ? formData.PayDtls.Nm : ""}
                   onChange={(e) => handlePayInput(e)}
                 />
               </div>
@@ -1472,9 +1738,8 @@ const InvForm = () => {
                   type="number"
                   class="form-control"
                   id="AccDet"
-                  aria-describedby="emailHelp"
                   name="AccDet"
-                  value={formData.PayDtls.AccDet}
+                  value={formData.PayDtls.AccDet ? formData.PayDtls.AccDet : ""}
                   onChange={(e) => handlePayInput(e)}
                 />
               </div>
@@ -1488,9 +1753,8 @@ const InvForm = () => {
                   type="text"
                   class="form-control"
                   id="Mode"
-                  aria-describedby="emailHelp"
                   name="Mode"
-                  value={formData.PayDtls.Mode}
+                  value={formData.PayDtls.Mode ? formData.PayDtls.Mode : ""}
                   onChange={(e) => handlePayInput(e)}
                 />
               </div>
@@ -1502,9 +1766,10 @@ const InvForm = () => {
                   type="text"
                   class="form-control"
                   id="FinInsBr"
-                  aria-describedby="emailHelp"
                   name="FinInsBr"
-                  value={formData.PayDtls.FinInsBr}
+                  value={
+                    formData.PayDtls.FinInsBr ? formData.PayDtls.FinInsBr : ""
+                  }
                   onChange={(e) => handlePayInput(e)}
                 />
               </div>
@@ -1518,9 +1783,10 @@ const InvForm = () => {
                   type="text"
                   class="form-control"
                   id="PayTerm"
-                  aria-describedby="emailHelp"
                   name="PayTerm"
-                  value={formData.PayDtls.PayTerm}
+                  value={
+                    formData.PayDtls.PayTerm ? formData.PayDtls.PayTerm : ""
+                  }
                   onChange={(e) => handlePayInput(e)}
                 />
               </div>
@@ -1532,9 +1798,10 @@ const InvForm = () => {
                   type="text"
                   class="form-control"
                   id="PayInstr"
-                  aria-describedby="emailHelp"
                   name="PayInstr"
-                  value={formData.PayDtls.PayInstr}
+                  value={
+                    formData.PayDtls.PayInstr ? formData.PayDtls.PayInstr : ""
+                  }
                   onChange={(e) => handlePayInput(e)}
                 />
               </div>
@@ -1548,9 +1815,8 @@ const InvForm = () => {
                   type="text"
                   class="form-control"
                   id="CrTrn"
-                  aria-describedby="emailHelp"
                   name="CrTrn"
-                  value={formData.PayDtls.CrTrn}
+                  value={formData.PayDtls.CrTrn ? formData.PayDtls.CrTrn : ""}
                   onChange={(e) => handlePayInput(e)}
                 />
               </div>
@@ -1562,9 +1828,8 @@ const InvForm = () => {
                   type="text"
                   class="form-control"
                   id="DirDr"
-                  aria-describedby="emailHelp"
                   name="DirDr"
-                  value={formData.PayDtls.DirDr}
+                  value={formData.PayDtls.DirDr ? formData.PayDtls.DirDr : ""}
                   onChange={(e) => handlePayInput(e)}
                 />
               </div>
@@ -1576,9 +1841,8 @@ const InvForm = () => {
                   type="number"
                   class="form-control"
                   id="CrDay"
-                  aria-describedby="emailHelp"
                   name="CrDay"
-                  value={formData.PayDtls.CrDay}
+                  value={formData.PayDtls.CrDay ? formData.PayDtls.CrDay : ""}
                   onChange={(e) => handlePayInput(e)}
                 />
               </div>
@@ -1592,9 +1856,10 @@ const InvForm = () => {
                   type="number"
                   class="form-control"
                   id="PaidAmt"
-                  aria-describedby="emailHelp"
                   name="PaidAmt"
-                  value={formData.PayDtls.PaidAmt}
+                  value={
+                    formData.PayDtls.PaidAmt ? formData.PayDtls.PaidAmt : ""
+                  }
                   onChange={(e) => handlePayInput(e)}
                 />
               </div>
@@ -1606,9 +1871,10 @@ const InvForm = () => {
                   type="number"
                   class="form-control"
                   id="PaymtDue"
-                  aria-describedby="emailHelp"
                   name="PaymtDue"
-                  value={formData.PayDtls.PaymtDue}
+                  value={
+                    formData.PayDtls.PaymtDue ? formData.PayDtls.PaymtDue : ""
+                  }
                   onChange={(e) => handlePayInput(e)}
                 />
               </div>
@@ -1628,9 +1894,10 @@ const InvForm = () => {
                   type="text"
                   class="form-control"
                   id="TransId"
-                  aria-describedby="emailHelp"
                   name="TransId"
-                  value={formData.EwbDtls.TransId}
+                  value={
+                    formData.EwbDtls.TransId ? formData.EwbDtls.TransId : ""
+                  }
                   onChange={(e) => handleEwabInput(e)}
                 />
               </div>
@@ -1642,9 +1909,10 @@ const InvForm = () => {
                   type="text"
                   class="form-control"
                   id="TransName"
-                  aria-describedby="emailHelp"
                   name="TransName"
-                  value={formData.EwbDtls.TransName}
+                  value={
+                    formData.EwbDtls.TransName ? formData.EwbDtls.TransName : ""
+                  }
                   onChange={(e) => handleEwabInput(e)}
                 />
               </div>
@@ -1652,27 +1920,30 @@ const InvForm = () => {
             <div className="data-input-fields">
               <div class="mb-2 w-50">
                 <label for="Distance" class="form-label">
-                  Distance of Transportation
+                  Distance of Transportation **
                 </label>
                 <input
                   type="number"
                   class="form-control"
                   id="Distance"
-                  aria-describedby="emailHelp"
                   name="Distance"
-                  value={formData.EwbDtls.Distance}
+                  value={
+                    formData.EwbDtls.Distance ? formData.EwbDtls.Distance : ""
+                  }
                   onChange={(e) => handleEwabInput(e)}
                 />
               </div>
               <div className="mb-2 w-50">
                 <label htmlFor="TransMode" className="form-label">
-                  Mode of Transportation **
+                  Mode of Transportation
                 </label>
                 <select
                   className="form-select"
                   id="TransMode"
                   name="TransMode"
-                  value={formData.EwbDtls.TransMode}
+                  value={
+                    formData.EwbDtls.TransMode ? formData.EwbDtls.TransMode : ""
+                  }
                   onChange={(e) => handleEwabInput(e)}
                 >
                   <option value="">Select State</option>
@@ -1692,9 +1963,12 @@ const InvForm = () => {
                   type="text"
                   class="form-control"
                   id="TransDocNo"
-                  aria-describedby="emailHelp"
                   name="TransDocNo"
-                  value={formData.EwbDtls.TransDocNo}
+                  value={
+                    formData.EwbDtls.TransDocNo
+                      ? formData.EwbDtls.TransDocNo
+                      : ""
+                  }
                   onChange={(e) => handleEwabInput(e)}
                 />
               </div>
@@ -1706,9 +1980,8 @@ const InvForm = () => {
                   type="date"
                   class="form-control"
                   id="TransDocDt"
-                  aria-describedby="emailHelp"
                   name="TransDocDt"
-                  value={formData.EwbDtls.TransDocDt}
+                  value={transDocDate}
                   onChange={(e) => handleEwabInput(e)}
                 />
               </div>
@@ -1722,9 +1995,8 @@ const InvForm = () => {
                   type="text"
                   class="form-control"
                   id="VehNo"
-                  aria-describedby="emailHelp"
                   name="VehNo"
-                  value={formData.EwbDtls.VehNo}
+                  value={formData.EwbDtls.VehNo ? formData.EwbDtls.VehNo : ""}
                   onChange={(e) => handleEwabInput(e)}
                 />
               </div>
@@ -1736,9 +2008,10 @@ const InvForm = () => {
                   type="text"
                   class="form-control"
                   id="VehType"
-                  aria-describedby="emailHelp"
                   name="VehType"
-                  value={formData.EwbDtls.VehType}
+                  value={
+                    formData.EwbDtls.VehType ? formData.EwbDtls.VehType : ""
+                  }
                   onChange={(e) => handleEwabInput(e)}
                 />
               </div>
@@ -1750,6 +2023,48 @@ const InvForm = () => {
         return "unknown step";
     }
   }
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+  };
+
+  const saveIrn = async (AckDt, AckNo, Irn, SignedInvoice, SignedQRCode) => {
+    await axios.post("http://localhost:3500/save-irn", {
+      AckDt,
+      AckNo,
+      Irn,
+      SignedInvoice,
+      SignedQRCode,
+    });
+  };
+
+  const handleSave = async () => {
+    await axios
+      .post(`http://localhost:3500/generate-invoice`, {
+        formData: formData,
+        auth: state,
+      })
+      .then((res) => {
+        if (res.data.ErrorDetails) {
+          if (res.data.ErrorDetails[0]?.ErrorMessage === "Invalid Token") {
+            navigation("/gst/e-invoice-auth");
+          } else {
+            console.log(res.data.ErrorDetails[0]?.ErrorMessage);
+          }
+        } else {
+          if (res.data.AckDt) {
+            saveIrn(
+              res.data.AckDt,
+              res.data.AckNo,
+              res.data.Irn,
+              res.data.SignedInvoice,
+              res.data.SignedQRCode
+            );
+          }
+        }
+      })
+      .catch((err) => console.error(err));
+  };
 
   return (
     <div style={{ background: "#F8F6F2", padding: "0" }}>
@@ -1773,7 +2088,7 @@ const InvForm = () => {
       ) : (
         <>
           {
-            <form className="form-input-fields">
+            <form className="form-input-fields" onSubmit={handleSubmit}>
               {getStepContent(activeStep)}
             </form>
           }
@@ -1791,7 +2106,7 @@ const InvForm = () => {
             className={classes.button}
             variant="contained"
             color="primary"
-            onClick={handleNext}
+            onClick={activeStep === steps.length - 1 ? handleSave : handleNext}
           >
             {activeStep === steps.length - 1 ? "Finish" : "Next"}
           </Button>

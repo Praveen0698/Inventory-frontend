@@ -28,7 +28,7 @@ const PinLogin = () => {
   const handleMpin = async (e) => {
     e.preventDefault();
     await axios
-      .post("https://inv.orivesolutions.com/mpin", { mpin: firstPin })
+      .post("http://localhost:3500/mpin", { mpin: firstPin })
       .then((result) =>
         result.data === "success" ? navigation("/dashboard") : setError("red")
       )

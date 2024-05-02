@@ -5,6 +5,8 @@ import { Bars } from "react-loader-spinner";
 import { useNavigate } from "react-router-dom";
 import "../../Styles.css";
 import axios from "axios";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const InvAuth = () => {
   const navigation = useNavigate();
@@ -55,12 +57,13 @@ const InvAuth = () => {
   };
 
   const handleSubmit = async (e) => {
+    showToastMessage();
     e.preventDefault();
     await axios
-      .post("https://inv.orivesolutions.com/e-invoice", formData)
+      .post("http://localhost:3500/e-invoice", formData)
       .then((result) => {
         setAuthData(result);
-        if (result.data) {
+        if (result.data.length > 0) {
           setTokenGot(result.data.Data.AuthToken);
           setSekGot(result.data.Data.Sek);
           setUsernameGot(result.data.Data.UserName);
@@ -69,13 +72,20 @@ const InvAuth = () => {
               Username: result.data.Data.UserName,
               Sek: result.data.Data.Sek,
               authToken: result.data.Data.AuthToken,
+              gst: formData.gstin,
             },
           });
+        } else if (result.data.length === 0) {
+          alert("Oopsss... Server Down!!");
         } else {
           alert("Oopsss... Server Down!!");
         }
       })
       .catch((err) => console.error(err));
+  };
+
+  const showToastMessage = () => {
+    toast.success("Success!!");
   };
 
   return (
@@ -104,6 +114,7 @@ const InvAuth = () => {
           <div className="layout-1" s>
             <SideBar navClick={navClick} side={side} />
             <div className="wrapper">
+              <ToastContainer position="top-center" />
               <NavBar
                 navClick={navClick}
                 setNavClick={setNavClick}
@@ -191,7 +202,7 @@ const InvAuth = () => {
                     </button>
                   </div>
                 </form>
-                {authData ? (
+                {authData && authData.length > 0 ? (
                   <div
                     className="other-sales-content-left"
                     style={{ marginLeft: "20px" }}

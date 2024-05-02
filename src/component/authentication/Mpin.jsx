@@ -28,7 +28,7 @@ const Mpin = () => {
   }, []);
 
   const getMpin = async () => {
-    const result = await axios.get("https://inv.orivesolutions.com");
+    const result = await axios.get("http://localhost:3500");
     setGetData(result.data);
   };
 
@@ -41,7 +41,7 @@ const Mpin = () => {
     if (firstPin === secondPin) {
       getData
         ? await axios
-            .put("https://inv.orivesolutions.com/set-mpin", {
+            .put("http://localhost:3500/set-mpin", {
               mpin: secondPin,
             })
             .then((result) => {
@@ -51,7 +51,7 @@ const Mpin = () => {
             })
             .catch((err) => console.error(err))
         : await axios
-            .post("https://inv.orivesolutions.com/set-mpin", {
+            .post("http://localhost:3500/set-mpin", {
               mpin: secondPin,
             })
             .then((result) => {

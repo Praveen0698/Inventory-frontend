@@ -54,7 +54,7 @@ const Dashboard = () => {
   const [totalStock, setTotalStock] = useState([]);
 
   const getStock = async () => {
-    const result = await axios.get("https://inv.orivesolutions.com/inventory");
+    const result = await axios.get("http://localhost:3500/inventory");
     const QuantityData = result.data.filter((item) => item.openingStock > 0);
 
     setTotalStock(QuantityData);
@@ -105,9 +105,7 @@ const Dashboard = () => {
   }, []);
 
   const getItemData = async () => {
-    const result = await axios.get(
-      "https://inv.orivesolutions.com/accounts/expense"
-    );
+    const result = await axios.get("http://localhost:3500/accounts/expense");
     const expenseData = result.data.filter((item) => item.purchasePrice > 0);
     setItemData(expenseData);
   };
@@ -122,7 +120,7 @@ const Dashboard = () => {
   const [soldQuantity, setSoldQuantity] = useState([]);
 
   const getSales = async () => {
-    const result = await axios.get("https://inv.orivesolutions.com/sales");
+    const result = await axios.get("http://localhost:3500/sales");
     const soldData = result.data.filter((item) => item.totalAmount > 0);
 
     setSoldQuantity(soldData);
@@ -159,9 +157,7 @@ const Dashboard = () => {
   const [getPayAmt, setGetPayAmt] = useState([]);
   const [getCollectAmt, setGetCollectAmt] = useState([]);
   const getBuyersSuppliers = async () => {
-    const result = await axios.get(
-      "https://inv.orivesolutions.com/buyers-suppliers"
-    );
+    const result = await axios.get("http://localhost:3500/buyers-suppliers");
     const payData = result.data.filter((item) => item.payAmount > 0);
     setGetPayAmt(payData);
     const collectData = result.data.filter((item) => item.collectAmount > 0);

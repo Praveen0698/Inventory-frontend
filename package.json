@@ -39,6 +39,7 @@
     "react-scripts": "^5.0.1",
     "react-select": "^5.8.0",
     "react-to-print": "^2.15.1",
+    "react-toastify": "^10.0.5",
     "scripts": "^0.1.0",
     "twilio": "^5.0.1",
     "use-scan-detection": "^0.2.3",

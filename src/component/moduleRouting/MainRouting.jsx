@@ -28,6 +28,9 @@ import Messaging from "../messaging/Messaging";
 import Bill from "../messaging/Bill";
 import InvAuth from "../accounts/InvAuth";
 import StepperCode from "../accounts/StepperCode";
+import Einvoice from "../accounts/Einvoice";
+import PrivacyPolicyPage from "../gateway/PrivacyPolicyPage";
+import Contact from "../gateway/Contact";
 
 const MainRouting = () => {
   return (
@@ -58,6 +61,9 @@ const MainRouting = () => {
       <Route path="/reports/main-report" element={<MainReport />} />
       <Route path="/gst/e-invoice-auth" element={<InvAuth />} />
       <Route path="/gst/e-invoice-generate" element={<StepperCode />} />
+      <Route path="/gst/e-invoice" element={<Einvoice />} />
+      <Route path="/policy-page" element={<PrivacyPolicyPage />} />
+      <Route path="/contact-page" element={<Contact />} />
     </Routes>
   );
 };

@@ -30761,3 +30761,14 @@ table.dataTable.dtr-inline.collapsed.d-row
 #stepper .MuiContainer-root {
   padding: 0;
 }
+
+.is-invalid {
+  border-color: #dc3545;
+  /* Other styles for invalid input */
+}
+
+.irn-btn {
+  padding: 5px 20px;
+  border: none;
+  color: white;
+}
