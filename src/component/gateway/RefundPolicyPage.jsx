@@ -6,7 +6,7 @@ import NavBar from "../NavBar";
 
 import { useNavigate } from "react-router-dom";
 
-const Contact = () => {
+const RefundPolicyPage = () => {
   const [side, setSide] = useState(false);
   const [navClick, setNavClick] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -67,36 +67,35 @@ const Contact = () => {
             />
             <div className="">
               <div className="privacy-policy-container">
-                <h1>Contact Us</h1>
-
+                <h1>Refund Policy</h1>
                 <div className="privacy-policy-content">
-                  <h3> Privacy Inquiries</h3>
                   <p>
-                    If you have any questions or concerns about our privacy
-                    practices, including inquiries about this Privacy Policy or
-                    exercising your rights regarding your personal information,
-                    we're here to assist you. Please feel free to reach out
-                    using any of the following contact methods:
+                    7 day return policy, which means you have 07 days after
+                    receiving your item to request a return. <br />
+                    <br />
+                    To be eligible for a return, your item must be in the same
+                    condition that you received it, unworn or unused, with tags,
+                    and in its original packaging. You’ll also need the receipt
+                    or proof of purchase.
                   </p>
                 </div>
                 <div className="privacy-policy-content">
-                  <h3>Contact Information:</h3>
+                  <h3>Refunds</h3>
                   <p>
-                    <b>Phone :</b> +91 9777798142<br></br>
-                    <b>Email :</b> admin@orivesolutions.com<br></br>
-                    <b>Address :</b> DCB-014, DLF Cyber City Rd, Chandaka
-                    Industrial Estate, Patia, Bhubaneswar, Odisha 751024, India{" "}
-                    <br></br>
-                    You can use any of the above means to contact us, and we'll
-                    respond promptly to your queries.
-                  </p>
-                </div>
-                <div className="privacy-policy-content">
-                  <h3></h3>
-                  <p>
-                    Thank you for choosing <b>Insta-E Mart. </b>
-                    We appreciate your trust and are committed to ensuring your
-                    privacy rights are respected.
+                    We will notify you once we’ve received and inspected your
+                    return, and let you know if the refund was approved or not.
+                    If approved, you’ll be automatically refunded on your
+                    original payment method within 5 business days. Please
+                    remember it can take some time for your bank or credit card
+                    company to process and post the refund too. <br />
+                    <br />
+                    If more than 7 business days have passed since we’ve
+                    approved your return, please contact us at{" "}
+                    <span
+                      style={{ color: "blue", textDecoration: "underline" }}
+                    >
+                      admin@orivesolutions.com
+                    </span>
                   </p>
                 </div>
               </div>
@@ -108,4 +107,4 @@ const Contact = () => {
   );
 };
 
-export default Contact;
+export default RefundPolicyPage;

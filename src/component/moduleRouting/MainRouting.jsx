@@ -31,6 +31,10 @@ import StepperCode from "../accounts/StepperCode";
 import Einvoice from "../accounts/Einvoice";
 import PrivacyPolicyPage from "../gateway/PrivacyPolicyPage";
 import Contact from "../gateway/Contact";
+import RefundPolicyPage from "../gateway/RefundPolicyPage";
+import EwayBill from "../accounts/EwayBill";
+import GstAll from "../accounts/GstAll";
+import StepperBillCode from "../accounts/StepperBillCode";
 
 const MainRouting = () => {
   return (
@@ -62,8 +66,11 @@ const MainRouting = () => {
       <Route path="/gst/e-invoice-auth" element={<InvAuth />} />
       <Route path="/gst/e-invoice-generate" element={<StepperCode />} />
       <Route path="/gst/e-invoice" element={<Einvoice />} />
+      <Route path="/gst/e-way-bill" element={<StepperBillCode />} />
+      <Route path="/gst" element={<GstAll />} />
       <Route path="/policy-page" element={<PrivacyPolicyPage />} />
       <Route path="/contact-page" element={<Contact />} />
+      <Route path="/refund-page" element={<RefundPolicyPage />} />
     </Routes>
   );
 };

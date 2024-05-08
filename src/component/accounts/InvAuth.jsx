@@ -16,6 +16,7 @@ const InvAuth = () => {
   const [sekGot, setSekGot] = useState("");
   const [authData, setAuthData] = useState();
   const [usernameGot, setUsernameGot] = useState("");
+  const [gstType, setGstType] = useState("");
 
   const [isLoading, setIsLoading] = useState(true);
 
@@ -63,22 +64,44 @@ const InvAuth = () => {
       .post("http://localhost:3500/e-invoice", formData)
       .then((result) => {
         setAuthData(result);
-        if (result.data.length > 0) {
+        console.log(result.data.ErrorDetails !== null);
+        console.log(result.data.ErrorDetails);
+        if (result.data.ErrorDetails === null) {
           setTokenGot(result.data.Data.AuthToken);
           setSekGot(result.data.Data.Sek);
           setUsernameGot(result.data.Data.UserName);
-          navigation("/gst/e-invoice-generate", {
-            state: {
-              Username: result.data.Data.UserName,
-              Sek: result.data.Data.Sek,
-              authToken: result.data.Data.AuthToken,
-              gst: formData.gstin,
-            },
-          });
+          if (gstType === "inv") {
+            navigation("/gst/e-invoice-generate", {
+              state: {
+                Username: result.data.Data.UserName,
+                Sek: result.data.Data.Sek,
+                authToken: result.data.Data.AuthToken,
+                gst: formData.gstin,
+              },
+            });
+          } else if (gstType === "eway") {
+            navigation("/gst/e-way-bill", {
+              state: {
+                Username: result.data.Data.UserName,
+                Sek: result.data.Data.Sek,
+                authToken: result.data.Data.AuthToken,
+                gst: formData.gstin,
+              },
+            });
+          } else {
+            navigation("/gst", {
+              state: {
+                Username: result.data.Data.UserName,
+                Sek: result.data.Data.Sek,
+                authToken: result.data.Data.AuthToken,
+                gst: formData.gstin,
+              },
+            });
+          }
         } else if (result.data.length === 0) {
           alert("Oopsss... Server Down!!");
         } else {
-          alert("Oopsss... Server Down!!");
+          alert(`${result.data.ErrorDetails[0].ErrorMessage}`);
         }
       })
       .catch((err) => console.error(err));
@@ -183,6 +206,25 @@ const InvAuth = () => {
                         value={formData.Password}
                         onChange={(e) => handleSaleInput(e)}
                       />
+                    </div>
+                  </div>
+                  <div className="data-input-fields">
+                    <div class="mb-3 w-100">
+                      <label htmlFor="gstType" className="form-label">
+                        Gst Type
+                      </label>
+                      <select
+                        className="form-select"
+                        id="gstType"
+                        name="gstType"
+                        value={gstType}
+                        onChange={(e) => setGstType(e.target.value)}
+                      >
+                        <option value="">Select GST Type</option>
+                        <option value="inv">E-Invoice</option>
+                        <option value="eway">E-Way Bill</option>
+                        <option value="gst">GST</option>
+                      </select>
                     </div>
                   </div>
                   <div className="data-input-fields">

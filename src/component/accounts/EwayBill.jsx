@@ -23,7 +23,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const InvForm = ({ state }) => {
+const EwayBill = ({ state }) => {
   const classes = useStyles();
   const [activeStep, setActiveStep] = useState(0);
   const steps = getSteps();
@@ -48,137 +48,60 @@ const InvForm = ({ state }) => {
   const navigation = useNavigate();
 
   const [formData, setFormData] = useState({
-    Version: "1.1",
-    Irn: null,
-    TranDtls: {
-      TaxSch: "GST",
-      SupTyp: "",
-      RegRev: "Y",
-      EcmGstin: null,
-      IgstOnIntra: "N",
-    },
-    DocDtls: {
-      Typ: "",
-      No: "",
-      Dt: "",
-    },
-    SellerDtls: {
-      Gstin: "",
-      LglNm: "",
-      TrdNm: null,
-      Addr1: "",
-      Addr2: null,
-      Loc: "",
-      Pin: 0,
-      Stcd: "",
-      Ph: null,
-      Em: null,
-    },
-    BuyerDtls: {
-      Gstin: "",
-      LglNm: "",
-      TrdNm: null,
-      Pos: "",
-      Addr1: "",
-      Addr2: null,
-      Loc: "",
-      Pin: 0,
-      Stcd: "",
-      Ph: null,
-      Em: null,
-    },
-    DispDtls: {
-      Nm: "",
-      Addr1: "",
-      Addr2: null,
-      Loc: "",
-      Pin: 0,
-      Stcd: "",
-    },
-    ShipDtls: {
-      Gstin: "",
-      LglNm: "",
-      TrdNm: null,
-      Addr1: "",
-      Addr2: null,
-      Loc: "",
-      Pin: 0,
-      Stcd: "",
-    },
-    ItemList: [
+    supplyType: "",
+    subSupplyType: "",
+    subSupplyDesc: "",
+    docType: "",
+    docNo: "",
+    docDate: "",
+    fromGstin: "",
+    fromTrdName: "",
+    fromAddr1: "",
+    fromAddr2: "",
+    fromPlace: "",
+    fromPincode: 0,
+    actFromStateCode: 0,
+    fromStateCode: 0,
+    toGstin: "",
+    toTrdName: "",
+    toAddr1: "",
+    toAddr2: "",
+    toPlace: "",
+    toPincode: 0,
+    actToStateCode: 0,
+    toStateCode: 0,
+    transactionType: 0,
+    otherValue: "",
+    totalValue: 0,
+    cgstValue: 0,
+    sgstValue: 0,
+    igstValue: 0,
+    cessValue: 0,
+    cessNonAdvolValue: 0,
+    totInvValue: 0,
+    transporterId: "",
+    transporterName: "",
+    transDocNo: "",
+    transMode: "",
+    transDistance: "",
+    transDocDate: "",
+    vehicleNo: "0",
+    vehicleType: "",
+    itemList: [
       {
-        SlNo: "",
-        PrdDesc: "",
-        IsServc: "N",
-        HsnCd: "",
-        Barcde: null,
-        Qty: 0,
-        FreeQty: 0,
-        Unit: "",
-        UnitPrice: 0,
-        TotAmt: 0,
-        Discount: 0,
-        PreTaxVal: 0,
-        AssAmt: 0,
-        GstRt: 0,
-        IgstAmt: 0,
-        CgstAmt: 0,
-        SgstAmt: 0,
-        CesRt: 0,
-        CesAmt: 0,
-        CesNonAdvlAmt: 0,
-        StateCesRt: 0,
-        StateCesAmt: 0,
-        StateCesNonAdvlAmt: 0,
-        OthChrg: 0,
-        TotItemVal: 0,
-        OrdLineRef: null,
-        OrgCntry: null,
-        PrdSlNo: null,
-        BchDtls: null,
-        AttribDtls: null,
+        productName: "",
+        productDesc: "",
+        hsnCode: 0,
+        quantity: 0,
+        qtyUnit: "",
+        cgstRate: 0,
+        sgstRate: 0,
+        igstRate: 0,
+        cessRate: 0,
+        cessNonadvol: 0,
+        taxableAmount: 0,
       },
     ],
-    ValDtls: {
-      AssVal: 0,
-      CgstVal: 0,
-      SgstVal: 0,
-      IgstVal: 0,
-      CesVal: 0,
-      StCesVal: 0,
-      Discount: 0,
-      OthChrg: 0,
-      RndOffAmt: 0,
-      TotInvVal: 0,
-      TotInvValFc: 0,
-    },
-    PayDtls: {
-      Nm: null,
-      AccDet: null,
-      Mode: null,
-      FinInsBr: null,
-      PayTerm: null,
-      PayInstr: null,
-      CrTrn: null,
-      DirDr: null,
-      CrDay: null,
-      PaidAmt: null,
-      PaymtDue: null,
-    },
-    RefDtls: null,
-    PrecDocDtls: null,
-    ContrDtls: null,
-    AddlDocDtls: null,
-    EwbDtls: {
-      TransId: null,
-      TransName: null,
-      TransMode: null,
-      Distance: "",
-      TransDocNo: null,
-      TransDocDt: null,
-      VehNo: null,
-      VehType: null,
-    },
   });
 
   const handleTranInput = (e) => {
@@ -196,8 +119,8 @@ const InvForm = ({ state }) => {
     if (e.target.name === "Dt") {
       const parsedDate = new Date(e.target.value);
       setDocumentDate(e.target.value);
-      const day = parsedDate.getDate().toString().padStart(2, "0"); // Add leading zero if needed
-      const month = (parsedDate.getMonth() + 1).toString().padStart(2, "0"); // Month is zero-based
+      const day = parsedDate.getDate().toString().padStart(2, "0");
+      const month = (parsedDate.getMonth() + 1).toString().padStart(2, "0");
       const year = parsedDate.getFullYear();
 
       const formattedDate = `${day}/${month}/${year}`;
@@ -471,34 +394,17 @@ const InvForm = ({ state }) => {
   const addItem = () => {
     const newItem = {
       id: new Date().getTime().toString(),
-      SlNo: "",
-      PrdDesc: "",
-      IsServc: "N",
-      HsnCd: "",
-      Barcde: null,
-      Qty: 0,
-      FreeQty: 0,
-      Unit: "",
-      UnitPrice: 0,
-      TotAmt: 0,
-      Discount: 0,
-      PreTaxVal: 0,
-      AssAmt: 0,
-      GstRt: 0,
-      IgstAmt: 0,
-      CgstAmt: 0,
-      SgstAmt: 0,
-      CesRt: 0,
-      CesAmt: 0,
-      CesNonAdvlAmt: 0,
-      StateCesRt: 0,
-      StateCesAmt: 0,
-      StateCesNonAdvlAmt: 0,
-      OthChrg: 0,
-      TotItemVal: 0,
-      OrdLineRef: null,
-      OrgCntry: null,
-      PrdSlNo: null,
+      productName: "",
+      productDesc: "",
+      hsnCode: 0,
+      quantity: 0,
+      qtyUnit: "",
+      cgstRate: 0,
+      sgstRate: 0,
+      igstRate: 0,
+      cessRate: 0,
+      cessNonadvol: 0,
+      taxableAmount: 0,
     };
     setItem([...item, newItem]);
     setID(newItem.id);
@@ -529,27 +435,50 @@ const InvForm = ({ state }) => {
           <>
             <div className="data-input-fields">
               <div className="mb-2 w-50">
-                <label htmlFor="SupTyp" className="form-label">
+                <label htmlFor="supplyType" className="form-label">
                   Code for Supply Type **
                 </label>
                 <select
                   className="form-select"
-                  id="SupTyp"
-                  name="SupTyp"
-                  value={formData.TranDtls.SupTyp}
+                  id="supplyType"
+                  name="supplyType"
+                  value={formData.supplyType}
                   onChange={(e) => handleTranInput(e)}
                 >
-                  <option value="">Select Transaction Type</option>
-                  <option value="B2B">B2B: Business to Business</option>
-                  <option value="B2C">B2C: Business to Consumer</option>
-                  <option value="SEZWP">SEZWP: To SEZ with Payment</option>
-                  <option value="SEZWOP">SEZWOP: To SEZ without Payment</option>
-                  <option value="EXPWP">EXPWP: Export with Payment</option>
-                  <option value="EXPWOP">EXPWOP: Export without Payment</option>
-                  <option value="DEXP">DEXP: Deemed Export</option>
+                  <option value="">Select Supply Type</option>
+                  <option value="I">Inward</option>
+                  <option value="O">Outward</option>
                 </select>
               </div>
 
+              <div className="mb-2 w-50">
+                <label htmlFor="subSupplyType" className="form-label">
+                  Code for Sub Supply Type **
+                </label>
+                <select
+                  className="form-select"
+                  id="subSupplyType"
+                  name="subSupplyType"
+                  value={formData.subSupplyType}
+                  onChange={(e) => handleTranInput(e)}
+                >
+                  <option value="">Select Sub Supply Type</option>
+                  <option value="1">Supply</option>
+                  <option value="2">Import</option>
+                  <option value="3">Export</option>
+                  <option value="4">Job Work</option>
+                  <option value="5">For Own Use</option>
+                  <option value="6">Job work Returns</option>
+                  <option value="7">Sales Returns</option>
+                  <option value="8">Others</option>
+                  <option value="9">SKD/CKD/Lots</option>
+                  <option value="10">Line Sales</option>
+                  <option value="11">Recipient Not Known</option>
+                  <option value="12">Exhibition or Fairs</option>
+                </select>
+              </div>
+            </div>
+            <div className="data-input-fields">
               <div className="mb-2 w-50">
                 <label htmlFor="Typ" className="form-label">
                   Document Type Code **
@@ -2139,4 +2068,4 @@ const InvForm = ({ state }) => {
   );
 };
 
-export default InvForm;
+export default EwayBill;
