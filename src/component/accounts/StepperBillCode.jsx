@@ -19,6 +19,8 @@ function StepperBillCode() {
   const [getOpen, setGetOpen] = useState(false);
   const [irnNumber, setIrnNumber] = useState("");
   const [getCancel, setGetCancel] = useState(false);
+  const [openError, setOpenError] = useState(false);
+  const [errorMsg, setErrorMsg] = useState([]);
 
   const { state } = useLocation();
 
@@ -119,6 +121,60 @@ function StepperBillCode() {
         </div>
       ) : (
         <>
+          {openError ? (
+            <div className="modal-ka-baap">
+              <div
+                className="add-item-modal-in"
+                style={{ width: "30%", height: "auto" }}
+              >
+                <div className="add-item-modal-top d-flex align-items-center justify-content-between">
+                  <div className="fw-bold fs-5">Error Messages</div>
+                  <IoMdCloseCircleOutline
+                    className="fs-5 close-modal-in"
+                    style={{ cursor: "pointer" }}
+                    onClick={() => {
+                      setOpenError(false);
+                      setErrorMsg([]);
+                    }}
+                  />
+                </div>
+
+                <div className="row g-3 mt-3 mb-5">
+                  <ul>
+                    {errorMsg.map((item) => (
+                      <li style={{ color: "red" }} key={item}>
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                  <div className="col-12 text-center mt-3">
+                    <span
+                      className="text-muted"
+                      style={{
+                        cursor: "pointer",
+                        position: "absolute",
+                        bottom: "20px",
+                        left: "20px",
+                        background: "black",
+                        padding: "5px 10px",
+                        borderRadius: "5px",
+                        fontWeight: "600",
+                      }}
+                    >
+                      <a
+                        onClick={() => {
+                          setOpenError(false);
+                          setErrorMsg([]);
+                        }}
+                      >
+                        Back
+                      </a>
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ) : null}
           {open ? (
             <div className="modal-ka-baap">
               <div
@@ -293,7 +349,11 @@ function StepperBillCode() {
                     <CssBaseline />
                     <Container component={Box} p={4}>
                       <Paper component={Box} p={3}>
-                        <EwayBill state={state} />
+                        <EwayBill
+                          state={state}
+                          setOpenError={setOpenError}
+                          setErrorMsg={setErrorMsg}
+                        />
                       </Paper>
                     </Container>
                   </div>

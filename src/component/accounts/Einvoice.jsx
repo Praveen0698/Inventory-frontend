@@ -57,9 +57,6 @@ const Einvoice = () => {
     setQrData(JSON.parse(jwtDecode(state.SignedQRCode).data));
   }, []);
 
-  console.log(invoiceData);
-  console.log(qrData);
-
   return (
     <div>
       {isLoading ? (

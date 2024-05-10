@@ -35,6 +35,8 @@ import RefundPolicyPage from "../gateway/RefundPolicyPage";
 import EwayBill from "../accounts/EwayBill";
 import GstAll from "../accounts/GstAll";
 import StepperBillCode from "../accounts/StepperBillCode";
+import ShippingPolicy from "../gateway/ShippingPolicy";
+import TermsCondition from "../gateway/TermsCondition";
 
 const MainRouting = () => {
   return (
@@ -71,6 +73,8 @@ const MainRouting = () => {
       <Route path="/policy-page" element={<PrivacyPolicyPage />} />
       <Route path="/contact-page" element={<Contact />} />
       <Route path="/refund-page" element={<RefundPolicyPage />} />
+      <Route path="/shipping-page" element={<ShippingPolicy />} />
+      <Route path="/terms-conditions-page" element={<TermsCondition />} />
     </Routes>
   );
 };
